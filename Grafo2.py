@@ -89,18 +89,13 @@ class Grafo(object):
         else:
             return "Aresta não encontrada"
 
-    def vert_adj(self, vertice_a):
-        res = list()
-        if vertice_a in self.v_list:
-            for aresta in self.a_list:
-                if (aresta.vertice_mae.id == vertice_a.id):
-                    res.append(aresta.vertice_pai.id)
-                if (aresta.vertice_pai.id == vertice_a.id):
-                    res.append(aresta.vertice_mae.id)
 
-            return res
-        else:
-            return "Vertice nao encontrado"
+    def cria_grafo(self,vertices,arestas):
+
+          pass
+
+
+
 
     def show_v(self):
         for vertice in self.v_list:
@@ -169,6 +164,8 @@ class Grafo(object):
 
 
 
+
+
 # V0 = Vertice("V0")
 # V1 = Vertice("V1")
 # V2 = Vertice("V2")
@@ -203,42 +200,64 @@ class Grafo(object):
 # G.add_aresta(A6)
 # G.add_aresta(A7)
 
-V0 = Vertice("V0")
-V1 = Vertice("V1")
-V2 = Vertice("V2")
-V3 = Vertice("V3")
-V4 = Vertice("V4")
-V5 = Vertice("V5")
-V6 = Vertice("V6")
+# V0 = Vertice("V0")
+# V1 = Vertice("V1")
+# V2 = Vertice("V2")
+# V3 = Vertice("V3")
+# V4 = Vertice("V4")
+# V5 = Vertice("V5")
+# V6 = Vertice("V6")
 
+meus_vertices = ["V0", "V1", "V2", "V3", "V4", "V5", "V6"]
+vertices = {}
+for v in meus_vertices:
+    vertices[v] = Vertice(v)
 
-A0 = Aresta(V0,V1)
-A1 = Aresta(V0,V2)
-A2 = Aresta(V1,V3)
-A3 = Aresta(V1,V4)
-A4 = Aresta(V2,V5)
-A5 = Aresta(V2,V6)
+for v in vertices.values():
+    print(v)
+minhas_arestas = [("V0","V1"), ("V0","V2"), ("V1","V3"), ("V1","V4"), ("V2","V5"), ("V2","V6"),]
+arestas = []
+for a in minhas_arestas:
+    v1,v2 = a
+    vertice_a = vertices[v1]
+    vertice_b = vertices[v2]
+    arestas.append(Aresta(vertice_a,vertice_b))
 
-H = Grafo()
+for a in arestas:
+    print(a)
 
-H.add_vertice(V0)
-H.add_vertice(V1)
-H.add_vertice(V2)
-H.add_vertice(V3)
-H.add_vertice(V4)
-H.add_vertice(V5)
-H.add_vertice(V6)
-
-H.add_aresta(A0)
-H.add_aresta(A1)
-H.add_aresta(A2)
-H.add_aresta(A3)
-H.add_aresta(A4)
-H.add_aresta(A5)
+for v in vertices.values():
+    print(v)
+# A0 = Aresta(V0,V1)
+# A1 = Aresta(V0,V2)
+# A2 = Aresta(V1,V3)
+# A3 = Aresta(V1,V4)
+# A4 = Aresta(V2,V5)
+# A5 = Aresta(V2,V6)
+#
+# H = Grafo()
+#
+# H.add_vertice(V0)
+# H.add_vertice(V1)
+# H.add_vertice(V2)
+# H.add_vertice(V3)
+# H.add_vertice(V4)
+# H.add_vertice(V5)
+# H.add_vertice(V6)
+#
+# H.add_aresta(A0)
+# H.add_aresta(A1)
+# H.add_aresta(A2)
+# H.add_aresta(A3)
+# H.add_aresta(A4)
+# H.add_aresta(A5)
 
 
 # G.show_v()
 # G.show_a()
 
-H.show_v()
-H.show_a()
+# H.show_v()
+# H.show_a()
+
+
+
