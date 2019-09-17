@@ -1,4 +1,4 @@
-import bisect
+from operator import attrgetter
 
 
 class Vertice(object):
@@ -19,7 +19,7 @@ class Vertice(object):
         nset = set(self.vizinhos)
         if vertice_a not in nset:
             self.vizinhos.append(vertice_a)
-            self.vizinhos.sort(key=lambda x: x.id)
+            self.vizinhos.sort(key=lambda x: x.id,reverse=True)
     def mostra_vizinho(self):
         for i in self.vizinhos:
            print(i.id,end=',')
@@ -34,15 +34,17 @@ class Aresta(object):
     total_arestas = 0
     identificacao = 0
 
-    def __init__(self, vertice_a, vertice_b, peso=1):
+    def __init__(self, vertice_a, vertice_b, peso=1,direcional=False):
         vertice_a.grau += 1
-        vertice_b.grau += 1
+        if vertice_a.id != vertice_b.id:
+         vertice_b.grau += 1
         vertice_a.add_vizinho(vertice_b)
         vertice_b.add_vizinho(vertice_a)
         self.vertice_pai = vertice_a
         self.vertice_mae = vertice_b
         self.peso = peso
         self.id = Aresta.identificacao
+        self.direcional = direcional
         Aresta.identificacao += 1
 
     def __str__(self):
@@ -54,45 +56,84 @@ class Aresta(object):
 #
 class Grafo(object):
 
+    grau_media = 0
+    grau_min = 0
+    grau_max = 0
+
     def __init__(self):
         self.v_list = []
         self.a_list = []
-        self.g_list = []
+
+    def calc_medias(self):
+        for vertice in self.v_list:
+            self.grau_media += vertice.grau;
+
+        self.grau_media = self.grau_media / len(self.v_list)
+
+        self.grau_min = min(self.v_list, key=attrgetter('grau'))
+        self.grau_max = max(self.v_list, key=attrgetter('grau'))
 
     def add_vertice(self, vertice_a):
         self.v_list.append(vertice_a)
+        self.calc_medias()
         return "Vertice adicionado"
 
     def add_aresta(self, aresta_a):
         self.a_list.append(aresta_a)
-
-        if (aresta_a.vertice_pai.grau) not in self.g_list:
-            bisect.insort(self.g_list, aresta_a.vertice_pai.grau)
-        if (aresta_a.vertice_mae.grau) not in self.g_list:
-            bisect.insort(self.g_list, aresta_a.vertice_mae.grau)
         return "Aresta adicionada"
 
     def del_vertice(self, vertice_a):
         if vertice_a in self.v_list:
+
+            #remove o vertice dos seus  abaixa o grau dos mesmos
+            for v in vertice_a.vizinhos:
+                v.vizinhos.remove(vertice_a)
+                v.grau += -1
+
+            #remove o vertice da lista de grafos
             self.v_list.remove(vertice_a)
+
+            #remove as arestas ligadas ao vertice
+            remover = []
             for aresta in self.a_list:
                 if (aresta.vertice_mae.id == vertice_a.id) or (aresta.vertice_pai.id == vertice_a.id):
-                    self.a_list.remove(aresta)
+                    remover.append(aresta)
+            for aresta in remover:
+                self.a_list.remove(aresta)
+
+            self.calc_medias()
             return "Vertice removido"
         else:
             return "Vertice não encontrado"
 
     def del_aresta(self, aresta_a):
         if aresta_a in self.a_list:
+            for vertice in self.v_list:
+                if (vertice.id == aresta_a.vertice_mae.id) or (vertice.id == aresta_a.vertice_pai.id):
+                    vertice.grau += -1
+                if (vertice.id == aresta_a.vertice_mae.id):
+                    vertice.vizinhos.remove(aresta_a.vertice_pai)
+                if (vertice.id == aresta_a.vertice_pai.id and aresta_a.vertice_pai.id != aresta_a.vertice_mae.id):
+                    vertice.vizinhos.remove(aresta_a.vertice_mae)
+
             self.a_list.remove(aresta_a)
+            self.calc_medias()
             return "Aresta removida"
         else:
             return "Aresta não encontrada"
 
 
     def cria_grafo(self,vertices,arestas):
+        v_dict = {}
 
-          pass
+        for v in vertices:
+            v_dict[v] = Vertice(v)
+            self.add_vertice(v_dict[v])
+        for a in arestas:
+            v1, v2 = a
+            vertice_a = v_dict[v1]
+            vertice_b = v_dict[v2]
+            self.add_aresta(Aresta(vertice_a, vertice_b))
 
 
 
@@ -105,15 +146,6 @@ class Grafo(object):
         for aresta in self.a_list:
             print(aresta)
 
-    def min_max(self):
-        res = [self.g_list[0], self.g_list[-1]]
-        return res
-
-    def avg_deg(self):
-        avg = 0
-        for vertice in self.v_list:
-            avg += vertice.grau
-        return avg / len(self.v_list)
 
     def adj_matrix(self):
         edge_list = []
@@ -165,99 +197,28 @@ class Grafo(object):
 
 
 
+G = Grafo()
 
-# V0 = Vertice("V0")
-# V1 = Vertice("V1")
-# V2 = Vertice("V2")
-# V3 = Vertice("V3")
-# V4 = Vertice("V4")
-#
-# A0 = Aresta(V0, V1)
-# A1 = Aresta(V0, V4)
-# A2 = Aresta(V1, V4)
-# A3 = Aresta(V1, V3)
-# A4 = Aresta(V3, V4)
-# A5 = Aresta(V1, V2)
-# A6 = Aresta(V2, V3)
-# A7 = Aresta(V0,V0)
-#
-#
-#
-# G = Grafo()
-#
-# G.add_vertice(V0)
-# G.add_vertice(V1)
-# G.add_vertice(V2)
-# G.add_vertice(V3)
-# G.add_vertice(V4)
-#
-# G.add_aresta(A0)
-# G.add_aresta(A1)
-# G.add_aresta(A2)
-# G.add_aresta(A3)
-# G.add_aresta(A4)
-# G.add_aresta(A5)
-# G.add_aresta(A6)
-# G.add_aresta(A7)
+g_vertices = ["V0","V1","V2","V3","V4"]
+g_arestas = [("V0","V1"),("V0","V4"),("V1","V4"),("V1","V3"),("V3","V4"),("V1","V2"),("V2","V3")]
 
-# V0 = Vertice("V0")
-# V1 = Vertice("V1")
-# V2 = Vertice("V2")
-# V3 = Vertice("V3")
-# V4 = Vertice("V4")
-# V5 = Vertice("V5")
-# V6 = Vertice("V6")
+G.cria_grafo(g_vertices,g_arestas)
 
-meus_vertices = ["V0", "V1", "V2", "V3", "V4", "V5", "V6"]
-vertices = {}
-for v in meus_vertices:
-    vertices[v] = Vertice(v)
+G.show_v()
+G.show_a()
 
-for v in vertices.values():
-    print(v)
-minhas_arestas = [("V0","V1"), ("V0","V2"), ("V1","V3"), ("V1","V4"), ("V2","V5"), ("V2","V6"),]
-arestas = []
-for a in minhas_arestas:
-    v1,v2 = a
-    vertice_a = vertices[v1]
-    vertice_b = vertices[v2]
-    arestas.append(Aresta(vertice_a,vertice_b))
 
-for a in arestas:
-    print(a)
-
-for v in vertices.values():
-    print(v)
-# A0 = Aresta(V0,V1)
-# A1 = Aresta(V0,V2)
-# A2 = Aresta(V1,V3)
-# A3 = Aresta(V1,V4)
-# A4 = Aresta(V2,V5)
-# A5 = Aresta(V2,V6)
-#
 # H = Grafo()
 #
-# H.add_vertice(V0)
-# H.add_vertice(V1)
-# H.add_vertice(V2)
-# H.add_vertice(V3)
-# H.add_vertice(V4)
-# H.add_vertice(V5)
-# H.add_vertice(V6)
 #
-# H.add_aresta(A0)
-# H.add_aresta(A1)
-# H.add_aresta(A2)
-# H.add_aresta(A3)
-# H.add_aresta(A4)
-# H.add_aresta(A5)
+# h_vertices = ["V0", "V1", "V2", "V3", "V4", "V5", "V6"]
+#
+# h_arestas = [("V0","V1"), ("V0","V2"), ("V1","V3"), ("V1","V4"), ("V2","V5"), ("V2","V6"),]
+# H.cria_grafo(h_vertices,h_arestas)
 
 
-# G.show_v()
-# G.show_a()
+
 
 # H.show_v()
 # H.show_a()
-
-
 
