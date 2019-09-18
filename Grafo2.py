@@ -182,6 +182,21 @@ class Grafo(object):
                 print(adjMatrix[i][k], " ", end='')
             print('')
         return adjMatrix
+    
+    def adjMatrix(self):
+      n = len(self.v_list)
+
+      adjMatrix = [[0 for i in range(n)] for k in range(n)]
+
+      for i,u in enumerate(self.v_list):
+        u_vizinhos = [x.id for x in u.vizinhos]
+        print(u_vizinhos)
+        for j,v in enumerate(self.v_list):
+          if v.id in u_vizinhos:
+            adjMatrix[i][j] += 1
+            
+          
+      printMatrix(adjMatrix)
     #Busca em profundidade
 
 
