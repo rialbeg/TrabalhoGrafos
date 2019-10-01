@@ -2,6 +2,31 @@ from operator import attrgetter
 from bisect import bisect_left
 
 
+#funções para criação de grafos por arquivo
+def ler_arquivo():
+    with open("grafos.txt","r") as f:
+        vert = []
+        arest = []
+        for line in f:
+            if line == "vertices\n":
+                vert = f.readline().rstrip().split(',')
+
+            if line == 'arestas\n':
+                arest = f.readline().rstrip().split(',')
+                par = []
+                for a in arest:
+                    par.append(tuple(a.split('-')))
+
+
+
+
+        return vert,par
+
+
+
+def dfs(grafo,ini):
+    return [x.id for x in grafo.dfs(ini)]
+
 def busca_binaria(a, x):
     i = bisect_left(a, x)
     if i != len(a) and a[i] == x:
@@ -21,6 +46,7 @@ class Vertice(object):
     total_vertices = 0
     identificacao = 0
 
+
     def __init__(self, nome):
         self.nome = nome
         self.id = Vertice.identificacao
@@ -31,11 +57,13 @@ class Vertice(object):
     def __str__(self):
         return "Vertice: %s || Grau: %s || Identificação: %s" % (self.nome, self.grau, self.id)
 
+    def reset_v(self):
+        Vertice.identificacao = 0
     def add_vizinho(self, vertice_a):
         nset = set(self.vizinhos)
         if vertice_a not in nset:
             self.vizinhos.append(vertice_a)
-            self.vizinhos.sort(key=lambda x: x.id, reverse=True)
+            self.vizinhos.sort(key=lambda x: x.id)
 
     def mostra_vizinho(self):
         for i in self.vizinhos:
@@ -61,6 +89,9 @@ class Aresta(object):
         self.direcional = direcional
         Aresta.identificacao += 1
 
+
+    def reset_a(self):
+        Aresta.identificacao = 0
     def __str__(self):
         return "Aresta %s || Entre os vertices %s e %s" % (
             self.id, self.vertice_pai.id, self.vertice_mae.id
@@ -94,6 +125,15 @@ class Grafo(object):
     def add_aresta(self, aresta_a):
         self.a_list.append(aresta_a)
         return "Aresta adicionada"
+
+    def add_nova_aresta(self,a,b):
+        vertice_a = [x for x in self.v_list if x.id == a][0]
+        vertice_b = [x for x in self.v_list if x.id == b][0]
+
+
+        aresta = Aresta(vertice_a,vertice_b)
+
+        self.add_aresta(aresta)
 
     def _del_vertice(self, vertice_a):
         if vertice_a in self.v_list:
@@ -190,6 +230,7 @@ class Grafo(object):
                     adjMatrix[i][j] += 1
 
         printMatrix(adjMatrix)
+        return adjMatrix
 
     # Busca em profundidade
     def _dfs(self, vertice_a, visitados=None):
@@ -202,6 +243,7 @@ class Grafo(object):
         return visitados
 
     def dfs(self,id_vertice):
+
         id_list = [x.id for x in self.v_list]
         x = bisect_left(id_list, id_vertice)
         res = []
@@ -210,6 +252,7 @@ class Grafo(object):
         else:
             res = 'vertice nao encontrado'
         return res
+
 
     def conexo(self):
         res = self.dfs(0)
@@ -230,21 +273,27 @@ class Grafo(object):
 
 G = Grafo()
 
-g_vertices = ["V0", "V1", "V2", "V3", "V4"]
-g_arestas = [("V0", "V1"), ("V0", "V4"), ("V1", "V4"), ("V1", "V3"), ("V3", "V4"), ("V1", "V2"), ("V2", "V3")]
+g_vertices = ["V0", "V1", "V2", "V3", "V4","V5"]
+g_arestas = [("V0", "V1"), ("V0", "V4"), ("V1", "V4"), ("V1", "V3"), ("V3", "V4"), ("V1", "V2"), ("V2", "V3"),("V2","V5")]
 
 G.cria_grafo(g_vertices, g_arestas)
 
 G.show_all()
 
-# H = Grafo()
-#
-#
-# h_vertices = ["V0", "V1", "V2", "V3", "V4", "V5", "V6"]
-#
-# h_arestas = [("V0","V1"), ("V0","V2"), ("V1","V3"), ("V1","V4"), ("V2","V5"), ("V2","V6"),]
-# H.cria_grafo(h_vertices,h_arestas)
+G.a_list[0].reset_a()
+G.v_list[0].reset_v()
 
 
-# H.show_v()
-# H.show_a()
+
+
+H = Grafo()
+
+
+h_vertices = ["V0", "V1", "V2", "V3", "V4", "V5", "V6"]
+
+h_arestas = [("V0","V1"), ("V0","V2"), ("V1","V3"), ("V1","V4"), ("V2","V5"), ("V2","V6"),]
+H.cria_grafo(h_vertices,h_arestas)
+
+
+H.show_all()
+
